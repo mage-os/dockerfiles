@@ -2,9 +2,6 @@
     "patches": {
       "magento/framework": {
         "Allow bin/magento setup:install on version 2.4.4": "https://patch-diff.githubusercontent.com/raw/magento/magento2/pull/33803.patch"
-      },
-      "magento/magento2-base": {
-        "Allow user to config error_reporting level": "https://github.com/magento/magento2/pull/35957.patch"
       }
     }
   }
