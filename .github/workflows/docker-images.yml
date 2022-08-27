@@ -1,0 +1,69 @@
+name: Docker Image CI
+
+on:
+  release:
+    types: [published]
+  push:
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!**/*.md'
+    branches:
+      - main
+  pull_request:
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!**/*.md'
+    branches:
+      - main
+
+env:
+  DOCKER_REPO_ORG: "mageopsrc"
+  DOCKER_IMAGE: "mirror"
+jobs:
+  build-php:
+    env:
+      DOCKER_TAG_NAME: ${{ github.head_ref || github.ref_name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        mage_os_version: ["2.4.4","2.4.4-p1", "2.4.5"]
+        kind: 
+          - "cli-alpine fpm-alpine"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set Image name
+      run: echo "DOCKER_IMAGE_NAME=${{ env.DOCKER_REPO_ORG }}/${{ env.DOCKER_IMAGE }}" >> $GITHUB_ENV
+
+    - name: Build the ${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.mage_os_version }} builder
+      run: |
+        docker build ./builder \
+          --build-arg MAGEOS_VERSION=${{ matrix.mage_os_version }} \
+          -t ${{ env.DOCKER_IMAGE_NAME }}:builder
+    
+    - name: Build the ${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.mage_os_version }} images
+      run: |
+        for image in ${{ matrix.kind }}; 
+          do docker build ./$image \
+        --build-arg BASE_BUILDER_IMAGE=${{ env.DOCKER_IMAGE_NAME }}:builder \
+        -t ${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.mage_os_version }}-$image-${{ env.DOCKER_TAG_NAME }} \
+        -t ${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.mage_os_version }}-$image 
+        done;
+
+    - name: Login to registry
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      if: ${{ github.event_name == 'release' }}
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+    
+    - name: Publish ${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.mage_os_version }} images
+      if: ${{ github.event_name == 'release' }}
+      run: | 
+        for image in ${{ matrix.kind }}; 
+          do 
+          docker push ${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.mage_os_version }}-$image-${{ env.DOCKER_TAG_NAME }}
+          docker push ${{ env.DOCKER_IMAGE_NAME }}:${{ matrix.mage_os_version }}-$image  
+        done;
