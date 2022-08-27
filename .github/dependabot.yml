@@ -1,0 +1,21 @@
+version: 2
+
+updates:
+  - directory: /builder
+    open-pull-requests-limit: 5
+    package-ecosystem: docker
+    rebase-strategy: auto
+    schedule:
+      interval: "weekly"
+  - directory: /cli-alpine
+    open-pull-requests-limit: 5
+    package-ecosystem: docker
+    rebase-strategy: auto
+    schedule:
+      interval: "weekly"
+  - directory: /fpm-alpine
+    open-pull-requests-limit: 5
+    package-ecosystem: docker
+    rebase-strategy: auto
+    schedule:
+      interval: "weekly"
