@@ -24,4 +24,8 @@ RUN php bin/magento setup:di:compile && \
     composer dump-autoload -o --classmap-authoritative && \
     php bin/magento setup:static-content:deploy -f  \
     --theme Magento/backend \
-    --theme Magento/luma
+    --theme Magento/luma \
+    && find var pub/media -type f -exec chmod g+w {} + \
+    && find var pub/media -type d -exec chmod g+ws {} + \
+    && chown -R :www-data var pub/media \ 
+    && chmod u+x bin/magento
