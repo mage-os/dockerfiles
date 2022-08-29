@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/damienwebdev/mageos-docker/compare/v1.0.1...v1.0.2) (2022-08-29)
+
+
+### Bug Fixes
+
+* set runtime permissions correctly ([b98431a](https://github.com/damienwebdev/mageos-docker/commit/b98431a3849fddac75c35174a4661800b7aa2249))
+
 ## [1.0.1](https://github.com/damienwebdev/mageos-docker/compare/v1.0.0...v1.0.1) (2022-08-27)
 
 
