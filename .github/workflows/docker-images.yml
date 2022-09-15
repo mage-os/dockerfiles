@@ -30,7 +30,7 @@ jobs:
       matrix:
         mage_os_version: ["2.4.4","2.4.4-p1", "2.4.5"]
         kind: 
-          - "cli-alpine fpm-alpine"
+          - "cli-alpine fpm-alpine fpm-alpine-xdebug"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
