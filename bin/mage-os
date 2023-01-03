@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+
+action=$1
+image="mage-os"
+
+message() {
+  echo ""
+  echo -e "$1"
+  seq ${#1} | awk '{printf "-"}'
+  echo ""
+}
+
+sudo sysctl vm.overcommit_memory=1
+sudo echo never /sys/kernel/mm/transparent_hugepage/enabled
+sudo sysctl vm.max_map_count=262144
+sudo systemctl daemon-reload
+
+if [ "$action" = "build" ]; then
+  
+  # shellcheck disable=SC2046
+  if [ $(docker ps -a | grep -c "$image") -gt 0 ]; then
+    message "stopping container and removing image"
+    docker stop "$image"
+    docker rm "$image"
+  fi
+
+  docker build -t osioaliu/"$image" .
+  docker run -it -d --name "$image" osioaliu/"$image"
+else
+  docker exec -it "$image" start
+fi
